@@ -25,11 +25,6 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error: Invalid IP address\n";
         exit(EXIT_FAILURE);
     }
-
-    std::cout << ((char*) &ip_addr); 
-
-    // char* start_port = argv[2];
-    // char* end_port = argv[3];
     
     unsigned start_port = std::stoi(argv[2]);
     unsigned end_port = std::stoi(argv[3]); 
@@ -53,31 +48,33 @@ void scan_ports(struct in_addr* ip_addr, unsigned start_port, unsigned end_port)
 
 
     for(int port = start_port; port <= end_port; ++port) {
-        //std::cout << "PORT " << port;
+        std::cout << "PORT " << port;
         
-        // getaddrinfo(ip_addr, )
-        int fd = socket(AF_INET, SOCK_STREAM, 0);
+        int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (fd < 0) {
             std::cerr << "Error: Failed to create socket\n";
             exit(EXIT_FAILURE);
         }
-        if (fcntl(fd, F_SETFL, O_NONBLOCK)) {
-            std::cerr << "Error: Failed to create socket\n";
-            exit(EXIT_FAILURE);      
-        }
+        // if (fcntl(fd, F_SETFL, O_NONBLOCK)) {
+        //     std::cerr << "Error: Failed to create socket\n";
+        //     exit(EXIT_FAILURE);      
+        // }
 
         addr.sin_port = htons(port); 
 
 
         auto res = connect(fd, (const struct sockaddr*) &addr, sizeof(addr));
-      //  std::cout << res << "\n";
+
+       std::cout << res << "\n";
         if (res == 0) {
             std::cout << "Port " << port << " :OPEN"; 
         }
         else if (res == -1 && errno != EINPROGRESS) {
+            std::cout << errno << "\n";
             std::cout << "Port " << port << " :CLOSED"; 
         } else {
-            std::cout << "Port " << port << " :NOTSURE"; 
+            std::cout << errno << "\n";
+            std::cout << "Port " << port << " :NOT SURE\n"; 
         }
 
 
